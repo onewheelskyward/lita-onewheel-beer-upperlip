@@ -92,7 +92,7 @@ module Lita
           response = RestClient.get('http://theupperlip.net/draft/')
           redis.setex('page_response', 1800, response)
         end
-        response.gsub! '<div id="responsecontainer"">', ''
+        # response.gsub! '<div id="responsecontainer"">', ''
         parse_response response
       end
 
@@ -103,11 +103,11 @@ module Lita
         Lita.logger.debug "parse_response started."
         gimme_what_you_got = {}
         noko = Nokogiri.HTML response
+        tap = 0
         noko.css('div#boxfielddata').each do |beer_node|
           # gimme_what_you_got
+          tap = tap + 1
           tap_name = get_tap_name(beer_node)
-          tap = tap_name.match(/\d+/).to_s
-          tap_type = tap_name.match(/(cask|nitro)/i).to_s
 
           remaining = beer_node.attributes['title'].to_s
 
@@ -115,18 +115,14 @@ module Lita
           beer_name = beer_node.css('span i').first.children.to_s
           beer_desc = get_beer_desc(beer_node)
           abv = get_abv(beer_desc)
-          full_text_search = "#{tap.sub /\d+/, ''} #{brewery} #{beer_name} #{beer_desc.to_s.gsub /\d+\.*\d*%*/, ''}"
-          prices = get_prices(beer_node)
+          full_text_search = "#{brewery} #{beer_name} #{beer_desc.to_s.gsub /\d+\.*\d*%*/, ''}"
 
           gimme_what_you_got[tap] = {
-              type: tap_type,
               remaining: remaining,
               brewery: brewery.to_s,
               name: beer_name.to_s,
               desc: beer_desc.to_s,
               abv: abv.to_f,
-              prices: prices,
-              price: prices[1][:cost],
               search: full_text_search
           }
         end
@@ -159,40 +155,9 @@ module Lita
         brewery
       end
 
-      # Returns ...
-      # There are a bunch of hidden html fields that get stripped after sanitize.
-      def get_prices(noko)
-        prices_str = noko.css('div#prices').children.to_s.strip
-        prices = Sanitize.clean(prices_str)
-            .gsub(/We're Sorry/, '')
-            .gsub(/Inventory Restriction/, '')
-            .gsub(/Inventory Failure/, '')
-            .gsub('Success!', '')
-            .gsub(/\s+/, ' ')
-            .strip
-        price_points = prices.split(/\s\|\s/)
-        prices_array = []
-        price_points.each do |price|
-          size = price.match /\d+(oz|cl)/
-          dollars = price.match(/\$\d+\.*\d*/).to_s.sub('$', '')
-          crowler = price.match ' Crowler'
-          size = size.to_s + crowler.to_s
-          p = {size: size, cost: dollars}
-          prices_array.push p
-        end
-        prices_array
-      end
-
       # Returns 1, 2, Cask 3, Nitro 4...
       def get_tap_name(noko)
-        noko.css('span')
-            .first
-            .children
-            .first
-            .to_s
-            .match(/[\w ]+\:/)
-            .to_s
-            .sub(/\:$/, '')
+        noko.css('span a').first.children.to_s
       end
 
       Lita.register_handler(self)
