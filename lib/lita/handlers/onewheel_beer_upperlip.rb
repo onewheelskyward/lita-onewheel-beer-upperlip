@@ -6,50 +6,50 @@ require 'lita-onewheel-beer-base'
 module Lita
   module Handlers
     class OnewheelBeerUpperlip < OnewheelBeerBase
-      route /^taps$/i,
-            :taps_list,
+      route /^upperlip$/i,
+            :upperlip_list,
             command: true,
-            help: {'taps' => 'Display the current taps.'}
+            help: {'upperlip' => 'Display the current taps.'}
 
-      route /^taps ([\w ]+)$/i,
-            :taps_deets,
+      route /^upperlip ([\w ]+)$/i,
+            :upperlip_deets,
             command: true,
-            help: {'taps 4' => 'Display the tap 4 deets, including prices.'}
+            help: {'upperlip 4' => 'Display the tap 4 deets, including prices.'}
 
-      route /^taps ([<>=\w.\s]+)%$/i,
-            :taps_by_abv,
+      route /^upperlip ([<>=\w.\s]+)%$/i,
+            :upperlip_by_abv,
             command: true,
-            help: {'taps >4%' => 'Display beers over 4% ABV.'}
+            help: {'upperlip >4%' => 'Display beers over 4% ABV.'}
 
-      route /^taps ([<>=\$\w.\s]+)$/i,
-            :taps_by_price,
+      route /^upperlip ([<>=\$\w.\s]+)$/i,
+            :upperlip_by_price,
             command: true,
-            help: {'taps <$5' => 'Display beers under $5.'}
+            help: {'upperlip <$5' => 'Display beers under $5.'}
 
-      route /^taps (roulette|random)$/i,
-            :taps_by_random,
+      route /^upperlip (roulette|random)$/i,
+            :upperlip_by_random,
             command: true,
-            help: {'taps roulette' => 'Can\'t decide?  Let me do it for you!'}
+            help: {'upperlip roulette' => 'Can\'t decide?  Let me do it for you!'}
 
-      route /^tapslow$/i,
-            :taps_by_remaining,
+      route /^upperliplow$/i,
+            :upperlip_by_remaining,
             command: true,
-            help: {'tapslow' => 'Show me the kegs at <10% remaining, or the lowest one available.'}
+            help: {'upperliplow' => 'Show me the kegs at <10% remaining, or the lowest one available.'}
 
-      route /^tapsabvlow$/i,
-            :taps_low_abv,
+      route /^upperlipabvlow$/i,
+            :upperlip_low_abv,
             command: true,
-            help: {'tapsabvlow' => 'Show me the lowest abv keg.'}
+            help: {'upperlipabvlow' => 'Show me the lowest abv keg.'}
 
-      route /^tapsabvhigh$/i,
-            :taps_high_abv,
+      route /^upperlipabvhigh$/i,
+            :upperlip_high_abv,
             command: true,
-            help: {'tapsabvhigh' => 'Show me the highest abv keg.'}
+            help: {'upperlipabvhigh' => 'Show me the highest abv keg.'}
 
-      def taps_list(response)
+      def upperlip_list(response)
         # wakka wakka
         beers = self.get_source
-        reply = "Bailey's taps: "
+        reply = "Bailey's Upperlip tap: "
         beers.each do |tap, datum|
           reply += "#{tap}) "
           reply += get_tap_type_text(datum[:type])
@@ -63,7 +63,7 @@ module Lita
       end
 
       def send_response(tap, datum, response)
-        reply = "Bailey's tap #{tap}) #{get_tap_type_text(datum[:type])}"
+        reply = "Bailey's Upperlip tap #{tap}) #{get_tap_type_text(datum[:type])}"
         reply += "#{datum[:brewery]} "
         reply += "#{datum[:name]} "
         reply += "- #{datum[:desc]}, "
@@ -89,7 +89,7 @@ module Lita
         Lita.logger.debug "get_source started"
         unless (response = redis.get('page_response'))
           Lita.logger.info 'No cached result found, fetching.'
-          response = RestClient.get('http://www.upperliptaproom.com/draft-list/')
+          response = RestClient.get('http://theupperlip.net/draft/')
           redis.setex('page_response', 1800, response)
         end
         response.gsub! '<div id="responsecontainer"">', ''
