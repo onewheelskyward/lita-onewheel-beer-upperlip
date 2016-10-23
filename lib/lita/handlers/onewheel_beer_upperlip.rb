@@ -7,7 +7,7 @@ module Lita
   module Handlers
     class OnewheelBeerUpperlip < OnewheelBeerBase
       route /^upperlip$/i,
-            :upperlip_list,
+            :taps_list,
             command: true,
             help: {'upperlip' => 'Display the current taps.'}
 
@@ -17,31 +17,31 @@ module Lita
             help: {'upperlip 4' => 'Display the tap 4 deets.'}
 
       route /^upperlip ([<>=\w.\s]+)%$/i,
-            :upperlip_by_abv,
+            :taps_by_abv,
             command: true,
             help: {'upperlip >4%' => 'Display beers over 4% ABV.'}
 
       route /^upperlip (roulette|random)$/i,
-            :upperlip_by_random,
+            :taps_by_random,
             command: true,
             help: {'upperlip roulette' => 'Can\'t decide?  Let me do it for you!'}
 
       route /^upperliplow$/i,
-            :upperlip_by_remaining,
+            :taps_by_remaining,
             command: true,
             help: {'upperliplow' => 'Show me the kegs at <10% remaining, or the lowest one available.'}
 
       route /^upperlipabvlow$/i,
-            :upperlip_low_abv,
+            :taps_low_abv,
             command: true,
             help: {'upperlipabvlow' => 'Show me the lowest abv keg.'}
 
       route /^upperlipabvhigh$/i,
-            :upperlip_high_abv,
+            :taps_high_abv,
             command: true,
             help: {'upperlipabvhigh' => 'Show me the highest abv keg.'}
 
-      def upperlip_list(response)
+      def taps_list(response)
         # wakka wakka
         beers = self.get_source
         reply = "Bailey's Upperlip tap: "
