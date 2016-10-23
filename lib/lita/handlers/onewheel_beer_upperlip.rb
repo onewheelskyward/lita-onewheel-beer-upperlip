@@ -12,19 +12,14 @@ module Lita
             help: {'upperlip' => 'Display the current taps.'}
 
       route /^upperlip ([\w ]+)$/i,
-            :upperlip_deets,
+            :taps_deets,
             command: true,
-            help: {'upperlip 4' => 'Display the tap 4 deets, including prices.'}
+            help: {'upperlip 4' => 'Display the tap 4 deets.'}
 
       route /^upperlip ([<>=\w.\s]+)%$/i,
             :upperlip_by_abv,
             command: true,
             help: {'upperlip >4%' => 'Display beers over 4% ABV.'}
-
-      route /^upperlip ([<>=\$\w.\s]+)$/i,
-            :upperlip_by_price,
-            command: true,
-            help: {'upperlip <$5' => 'Display beers under $5.'}
 
       route /^upperlip (roulette|random)$/i,
             :upperlip_by_random,
@@ -68,20 +63,11 @@ module Lita
         reply += "#{datum[:name]} "
         reply += "- #{datum[:desc]}, "
         # reply += "Served in a #{datum[1]['glass']} glass.  "
-        reply += "#{get_display_prices datum[:prices]}, "
         reply += "#{datum[:remaining]}"
 
         Lita.logger.info "send_response: Replying with #{reply}"
 
         response.reply reply
-      end
-
-      def get_display_prices(prices)
-        price_array = []
-        prices.each do |p|
-          price_array.push "#{p[:size]} - $#{p[:cost]}"
-        end
-        price_array.join ' | '
       end
 
       def get_source
@@ -157,7 +143,7 @@ module Lita
 
       # Returns 1, 2, Cask 3, Nitro 4...
       def get_tap_name(noko)
-        noko.css('span a').first.children.to_s
+        noko.css('span').first.children.to_s
       end
 
       Lita.register_handler(self)
